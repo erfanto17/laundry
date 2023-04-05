@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddUserRequest;
-use App\Http\Requests\EditUserRequest;
 use App\User;
+use App\Outlet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\AddUserRequest;
+use App\Http\Requests\EditUserRequest;
 
 class BasicController extends Controller
 {
@@ -18,9 +19,14 @@ class BasicController extends Controller
      */
     public function index()
     {
+
+        $outlet = Outlet::all();
+        $users = User::all();
+
         return view('basic.list', [
-            'title' => 'Basic CRUD',
-            'users' => User::paginate(10)
+            'title' => 'Data Pengguna',
+            'users' => $users,
+            'outlet' => $outlet
         ]);
     }
 
@@ -31,9 +37,13 @@ class BasicController extends Controller
      */
     public function create()
     {
+        $outlet = Outlet::all();
+        $users = User::with('outlet')->get();
+
         return view('basic.create', [
             'title' => 'New User',
-            'users' => User::paginate(10)
+            'users' => $users,
+            'outlet' => $outlet
         ]);
     }
 
@@ -49,6 +59,8 @@ class BasicController extends Controller
             'name' => $request->name,
             'last_name' => $request->last_name,
             'email' => $request->email,
+            'id_outlet' => $request->id_outlet,
+            'role' => $request->role,
             'password' => Hash::make($request->password)
         ]);
 
@@ -72,12 +84,19 @@ class BasicController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $basic)
+    public function edit( $id)
     {
+
+        $outlet = Outlet::all();
+        $user = User::find($id);
+ 
         return view('basic.edit', [
             'title' => 'Edit User',
-            'user' => $basic
+            'outlet' => $outlet,
+            'user' => $user,
+            
         ]);
+        
     }
 
     /**
@@ -94,6 +113,8 @@ class BasicController extends Controller
         }
         $basic->name = $request->name;
         $basic->last_name = $request->last_name;
+        $basic->role = $request->role;
+        $basic->id_outlet = $request->id_outlet;
         $basic->email = $request->email;
         $basic->save();
 

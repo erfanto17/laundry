@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'last_name', 'email', 'password',
+        'name', 'last_name', 'email', 'password', 'role', 'id_outlet'
     ];
 
     /**
@@ -44,5 +44,9 @@ class User extends Authenticatable
         }
 
         return "{$this->name} {$this->last_name}";
+    }
+
+     public function outlet(){
+        return $this-> hasOne(Outlet::class , 'id', 'id_outlet');
     }
 }
